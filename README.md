@@ -3,9 +3,9 @@
 Minimal gym for AI experiments (RL, ML, planning, etc.) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/).
 Characters are inspired by the old classic ZZT (https://museumofzzt.com/).
 
-### Components
+### main components
 
-#### World definition
+#### world definition
 
 The map of the target 2D environment is specified as a multi-line string.
 
@@ -37,7 +37,7 @@ The map shows:
 
 All components of the scene are agents handled by mesa.
 
-#### Setup and execution
+#### setup and execution
 
 The map is used to create the computational model of the envinroment, placing elements in the correct position. A `view` class can be used to generate a visual representation to follow the execution. The execution is discrete, and follows the convention of Mesa. 
 
@@ -53,12 +53,11 @@ while True:
         break
 ```
 
-#### Body and mental elements
+#### distinction of body and mental elements
 
-To facilitate problem decomposition, players are defined by body (dealing with mechanicistic interventions on and by the environment), and mind (dealing with sensory/motor decision mechanisms). As a good practice, given a certain domain, intervention of modelers should be only at mental level. 
-So, in practice, the body eg. `AgentBody(mesa.Agent)` class that comes with the environment, which is extended by a mental element.
+To facilitate problem decomposition, agents may be defined as body (dealing with mechanicistic interventions on and by the environment) and mind (dealing with sensory/motor decision mechanisms). As a good practice, given a certain domain, intervention of modelers should be only at mental level, eg. there is a body eg. `AgentBody(mesa.Agent)` class that comes with the environment, which is then extended by a mental element.
 
-For instance in this case, the agent takes the perceptions (only a limited portion of the environment), identify the positions by the relative coordinates coming from the perception, and move randomly in any of those. 
+In the current code, for instance, the agent takes the perceptions (only a limited portion of the environment), identify the positions by the relative coordinates coming from the perception, and move randomly in any of those. 
 
 ```
 class RandomWalkingAgent(AgentBody):
@@ -72,7 +71,20 @@ class RandomWalkingAgent(AgentBody):
         self.move(self.random.choice(potential_positions))
 ```
 
-### Dependencies
+#### extensions
+
+In principle, one can use this framework to:
+- setup reinforcement learning algorithms for creating policies
+- setup classificatory algorithms for creating abstractions of perceptual data
+- setup hard-coded rules to regulate behaviour
+- setup a full-fledged BDI decision-making cycle,
+- ... 
+
+#### to do
+
+- create interfaces towards Open AI gym and pettingzoo.. 
+
+### dependencies
 
 ```
 pip install mesa
