@@ -52,7 +52,7 @@ while True:
         break
 ```
 
-#### distinction of body and mental elements
+#### separation of 'body' and 'mental' elements
 
 To facilitate problem decomposition, agents may be defined as body (dealing with mechanicistic interventions on and by the environment) and mind (dealing with sensory/motor decision mechanisms). As a good practice, given a certain domain, intervention of modelers should be only at mental level, eg. there is a body eg. `AgentBody(mesa.Agent)` class that comes with the environment, which is then extended by a mental element.
 
