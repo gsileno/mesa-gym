@@ -1,7 +1,6 @@
 # mesa-gym
 
-Minimal gym for AI experiments (RL, ML, planning, etc.) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/).
-Characters are inspired by the old classic ZZT (https://museumofzzt.com/).
+Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ..) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/). Characters are inspired by the old classic ZZT (https://museumofzzt.com/).
 
 ### main components
 
