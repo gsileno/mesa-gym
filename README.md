@@ -82,6 +82,7 @@ In principle, one can use this framework to:
 
 #### to do
 
+- this is a super-minimal self-contained script at the moment, should be refactored to be more modular
 - create interfaces towards Open AI gym and pettingzoo.. 
 
 ### dependencies
