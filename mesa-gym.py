@@ -131,7 +131,9 @@ class AgentBody(mesa.Agent):
             if elem != self:
                 if type(elem) == Grass:
                     elem.amount -= 5
-
+                    if elem.amount < 0:
+                        elem.amount = 0
+                        
     def move(self, direction):    
         # self.trace(f"attempt action 'move' {direction}")
         dx, dy = direction 
