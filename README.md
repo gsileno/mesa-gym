@@ -1,14 +1,19 @@
 # mesa-gym
 
-Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/). Characters are inspired by the old classic ZZT (https://museumofzzt.com/).
+Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/). 
 
-### main components
+Available worlds:
+- `mesa_zzt`: 2D grid world, characters are inspired by the old classic ZZT (https://museumofzzt.com/).
+- `mesa_market`: market with various sale transactions 
 
-#### world definition
+Those worlds can be run standalone, or connected as environments for the `gymnasium`/`pettingzoo` library
+
+## Available worlds  
+
+### ZZT-like 2D grid world
 
 The map of the target 2D environment is specified as a multi-line string.
-
-For instance in the current code we have:
+For instance:
 
 ```
 map = """
@@ -70,7 +75,13 @@ class RandomWalkingAgent(AgentBody):
         self.move(self.random.choice(potential_positions))
 ```
 
-#### extensions
+### market world
+
+[..] todo 
+
+
+
+## extensions
 
 In principle, one can use this framework to:
 - setup reinforcement learning algorithms for creating policies
@@ -79,13 +90,29 @@ In principle, one can use this framework to:
 - setup a full-fledged BDI decision-making cycle,
 - ... 
 
-#### to do
+## to do
 
 - this is a super-minimal self-contained script at the moment, should be refactored to be more modular
-- create interfaces towards Open AI gym and pettingzoo.. 
+- create interfaces towards gymnasium and pettingzoo.. 
 
-### dependencies
+## dependencies
 
+The fastest way to install all dependencies is to install `mesa_gym` as a package:
+```
+pip install -e .
+```
+
+If you want to install packages manually, for the worlds to run:
 ```
 pip install mesa
+```
+
+To use gymnasium for RL:
+```
+pip install gymnasium
+```
+
+For worlds requiring graphics:
+```
+pip install pygame
 ```
