@@ -19,15 +19,15 @@ Main components of `mesa-gym`:
 
 To start with, you can run (from within the `mesa_gym` directory)
 
-- to simulate a multi-agent world, using only `mesa`:
+- to execute a multi-agent world, using only `mesa`:
 ```
 python worlds/mesa_zzt.py
 ``` 
-- to simulate a multi-agent world, using a `gymnasium` custom environment on top of `mesa`, and possibly pre-trained models
+- to execute a multi-agent world, using a `gymnasium` custom environment on top of `mesa`, and possibly pre-trained models
 ```
 python scripts/mesa_zzt_script.py
 ``` 
-- to train lion and ranger in `mesa_zzt` using tabular q-learning
+- to train lion(s) and ranger(s) in `mesa_zzt` using tabular q-learning
 ```
 python trainees/mesa_zzt_trainee.py
 ```
