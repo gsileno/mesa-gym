@@ -5,7 +5,7 @@ Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agen
 ## Main components
 
 The infrastructure consists of different modules:
-- the `mesa` part is about programming the environment and possibly hard-coding the agents: actions (and disabilities), what happens at performance, etc. When executed it makes change on the environment and returns relevant event (to be specified):
+- the `mesa` part is about programming the environment and possibly hard-coding the agents: actions (and disabilities), what happens at performance, etc. When executed it makes change on the environment and returns relevant events:
 - the `gymnasium` environment collects the states and compute the rewards (typically from the events). 
 - training methods work on top of the `gymnasium` environment
 
