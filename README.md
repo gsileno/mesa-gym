@@ -23,7 +23,7 @@ To start with, you can run (from within the `mesa_gym` directory)
 ```
 python worlds/mesa_zzt.py
 ``` 
-- to simulate a multi-agent world, using `mesa` below a `gymnasium` environment, and possibly pre-trained models
+- to simulate a multi-agent world, using a `gymnasium` custom environment on top of `mesa`, and possibly pre-trained models
 ```
 python scripts/mesa_zzt_script.py
 ``` 
