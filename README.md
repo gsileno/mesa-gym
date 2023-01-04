@@ -1,6 +1,6 @@
 # mesa-gym
 
-Infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the [Mesa](https://mesa.readthedocs.io/en/latest/) agent library to design gym environments, to be embedded eg. in custom environments for [gymnasium](https://gymnasium.farama.org/).
+Infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...). It relies on [Mesa](https://mesa.readthedocs.io/en/latest/) multi-agent library to design gym environments, to be embedded eg. in custom environments for [gymnasium](https://gymnasium.farama.org/).
 
 ## Main components
 
