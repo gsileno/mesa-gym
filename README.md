@@ -2,11 +2,27 @@
 
 Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/). 
 
-Available worlds:
-- `mesa_zzt`: 2D grid world, characters are inspired by the old classic ZZT (https://museumofzzt.com/).
-- `mesa_market`: market with various sale transactions 
+Main components of `mesa-gym`:
+- `worlds`: worlds that runs on `mesa`. they can be run standalone
+  - `mesa_zzt.py`: 2D grid world, characters are inspired by the old classic ZZT (https://museumofzzt.com/).
+  - `mesa_market.py`: a simple market with sale transactions (not working now)
+- `envs`: custom environments for `gymnasium` relying on `mesa` worlds 
+  - `mesa_zzt_env.py`
+- `scripts`: simple scripts that runs the worlds, possibly reusing trained models
+  - `mesa_zzt_script.py`
+- `trainees`: RL methods to create agent models
+  - `trained_models`: pre-trained models
+    - `mesa_zzt_trainee.py`: training batch for agents in `mesa_zzt` 
+    - `qlearning.py`: tabular q-learning agent
+  - `training_data`: training data and visualizationn helpers
+    - `data_viz.py`: visualize variation of performance during training
 
-Those worlds can be run standalone, or connected as environments for the `gymnasium`/`pettingzoo` library
+To start with, you can run 
+- `worlds/mesa_zzt.py`: to execute the world, using only `mesa`
+- `scripts/mesa_zzt_script.py`: to execute the world, using `mesa`, `gymnasium` environment, and possibly pre-trained models
+- `trainees/mesa_zzt_trainee.py`: to train lion and ranger in `mesa_zzt` using tabular q-learning
+- `trainees/training_data/data_viz.py`: to visualize data issued from training
+
 
 ## Available worlds  
 
@@ -75,12 +91,6 @@ class RandomWalkingAgent(AgentBody):
         self.move(self.random.choice(potential_positions))
 ```
 
-### market world
-
-[..] todo 
-
-
-
 ## extensions
 
 In principle, one can use this framework to:
@@ -115,4 +125,9 @@ pip install gymnasium
 For worlds requiring graphics:
 ```
 pip install pygame
+```
+
+If you require to visualize diagrams
+```
+pip install matplotlib
 ```

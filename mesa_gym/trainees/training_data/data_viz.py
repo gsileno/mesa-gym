@@ -1,10 +1,14 @@
-experiment_file = "zzt-random_100.pickle"
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+
+experiment_file = "zzt-qlearning_1000_0.01_1.0_0.002_0.1.pickle"
+view_fields = ["reward", "collided"]  # at least two fields, otherwise there are problems.
 
 import pickle
-with open(experiment_file, "rb") as f:
+with open(f"{path}/{experiment_file}", "rb") as f:
     data = pickle.load(f)
 
-data_fields = data["fields"]
+data_fields = data["fields"] + ["reward"]
 del(data["fields"])
 
 # data processing for visualization
@@ -35,22 +39,22 @@ import matplotlib.pyplot as plt
 episodes = df.episode.unique()
 agents = df.agent.unique()
 
-fig, axs = plt.subplots(ncols=len(data_fields), nrows=len(agents), figsize=(12, 5))
+fig, axs = plt.subplots(ncols=len(view_fields), nrows=len(agents), figsize=(12, 5))
 
 for i, agent in enumerate(agents):
     x = []
     y = {}
-    for key in data_fields:
+    for key in view_fields:
         y[key] = []
 
     for episode in episodes:
         x.append(episode)
-        Y = df[(df["agent"] == agent) & (df["episode"] == episode)][data_fields].sum()
-        for key in data_fields:
+        Y = df[(df["agent"] == agent) & (df["episode"] == episode)][view_fields].sum()
+        for key in view_fields:
             y[key].append(Y[key])
 
     # Plot outcomes
-    for j, key in enumerate(data_fields):
+    for j, key in enumerate(view_fields):
         axs[i][j].set_title(f"agent {agent}")
         axs[i][j].set_xlabel("episode number")
         axs[i][j].set_ylabel(key)

@@ -1,3 +1,6 @@
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+
 # load the target environment
 import mesa_gym.envs.mesa_zzt_env
 env = mesa_gym.envs.mesa_zzt_env.MesaZZTEnv(render_mode=None)
@@ -115,9 +118,13 @@ for episode in tqdm(range(n_episodes)):
 
 import pickle
 for trainee in trainees:
-    with open(f"trained_models/{type_agent[trainee]}_{trainee}_{experiment_name}.pickle", "wb") as f:
+    filename = f"trained_models/{type_agent[trainee]}_{trainee}_{experiment_name}.pickle"
+    with open(f"{path}/{filename}", "wb") as f:
         pickle.dump(trainees[trainee].q_table(), f)
+        print(f"trained model saved in {filename}")
 
 import pickle
-with open(f"training_data/{experiment_name}.pickle", "wb") as f:
+filename = f"training_data/{experiment_name}.pickle"
+with open(f"{path}/{filename}", "wb") as f:
     pickle.dump(data, f)
+    print(f"training data saved in {filename}")
