@@ -17,12 +17,24 @@ Main components of `mesa-gym`:
   - `/training_data`: training data and visualizationn helpers
     - `data_viz.py`: visualize variation of performance during training
 
-To start with, you can run 
-- `worlds/mesa_zzt.py`: to execute the world, using only `mesa`
-- `scripts/mesa_zzt_script.py`: to execute the world, using `mesa`, `gymnasium` environment, and possibly pre-trained models
-- `trainees/mesa_zzt_trainee.py`: to train lion and ranger in `mesa_zzt` using tabular q-learning
-- `trainees/training_data/data_viz.py`: to visualize data issued from training
+To start with, you can run (from within the `mesa_gym` directory)
 
+- to simulate a multi-agent world, using only `mesa`:
+```
+python worlds/mesa_zzt.py
+``` 
+- to simulate a multi-agent world, using `mesa` below a `gymnasium` environment, and possibly pre-trained models
+```
+python scripts/mesa_zzt_script.py
+``` 
+- to train lion and ranger in `mesa_zzt` using tabular q-learning
+```
+python trainees/mesa_zzt_trainee.py
+```
+- to visualize (meta-)data produced during training
+```
+python trainees/training_data/data_viz.py
+````
 
 ## Available worlds  
 
