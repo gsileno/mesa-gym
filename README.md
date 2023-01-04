@@ -27,7 +27,7 @@ python worlds/mesa_zzt.py
 ```
 python scripts/mesa_zzt_script.py
 ``` 
-- to train lion(s) and ranger(s) in `mesa_zzt` using tabular q-learning
+- to train lion(s) and ranger(s) in `mesa_zzt` using tabular q-learning within `gymnasium` 
 ```
 python trainees/mesa_zzt_trainee.py
 ```
