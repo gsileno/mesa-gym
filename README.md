@@ -3,9 +3,9 @@
 Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/). 
 
 Main components of `mesa-gym`:
-- `/worlds`: worlds that runs on `mesa`. they can be run standalone
+- `/worlds`: worlds that runs on `mesa`. they can be executed standalone
   - `mesa_zzt.py`: 2D grid world, characters are inspired by the old classic ZZT (https://museumofzzt.com/).
-  - `mesa_market.py`: a simple market with sale transactions (not working now)
+  - `mesa_market.py`: a simple market with sale transactions (still in development, not working now)
 - `/envs`: custom environments for `gymnasium` relying on `mesa` worlds 
   - `mesa_zzt_env.py`
 - `/scripts`: simple scripts that runs the worlds, possibly reusing trained models
