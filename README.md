@@ -1,13 +1,17 @@
 # mesa-gym
 
-Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/). 
+Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/), and providing custom environments for gymnasium (https://github.com/Farama-Foundation/Gymnasium), a common library for RL research and practice.  
+
+## Main components
 
 The infrastructure consists of different modules:
 - the `mesa` part is about programming the environment and possibly hard-coding the agents: actions (and disabilities), what happens at performance, etc. When executed it makes change on the environment and returns relevant event (to be specified):
 - the `gymnasium` environment collects the states and compute the rewards (typically from the events). 
 - training methods work on top of the `gymnasium` environment
 
-Structure of `mesa-gym`:
+### Project structure
+
+structure of `mesa-gym`:
 - `/worlds`: worlds that runs on `mesa`. they can be executed standalone
   - `mesa_zzt.py`: 2D grid world, characters are inspired by the old classic ZZT (https://museumofzzt.com/).
   - `mesa_market.py`: a simple market with sale transactions (still in development, not working now)
@@ -22,7 +26,9 @@ Structure of `mesa-gym`:
   - `/training_data`: training data and visualizationn helpers
     - `data_viz.py`: visualize variation of performance during training
 
-To start with, you can run (from within the `mesa_gym` directory)
+### Starting scripts
+
+To start, you can run (from within the `mesa_gym` directory)
 
 - to execute a multi-agent world, using only `mesa`:
 ```
@@ -76,7 +82,7 @@ All components of the scene are agents handled by mesa.
 
 #### setup and execution
 
-The map is used to create the computational model of the envinroment, placing elements in the correct position. A `view` class can be used to generate a visual representation to follow the execution. The execution is discrete, and follows the convention of Mesa. 
+The map is used to create the computational model of the envinroment, placing elements in the correct position. A `view` class can be used to generate a visual representation to follow the execution. The execution is discrete, and follows the convention of Mesa: 
 
 ```
 model = create_world(map)
@@ -111,7 +117,7 @@ class RandomWalkingAgent(AgentBody):
 ## extensions
 
 In principle, one can use this framework to:
-- setup reinforcement learning algorithms for creating policies
+- setup reinforcement learning algorithms for creating policies automatically
 - setup classificatory algorithms for creating abstractions of perceptual data
 - setup hard-coded rules to regulate behaviour
 - setup a full-fledged BDI decision-making cycle,
@@ -119,8 +125,7 @@ In principle, one can use this framework to:
 
 ## to do
 
-- this is a super-minimal self-contained script at the moment, should be refactored to be more modular
-- create interfaces towards gymnasium and pettingzoo.. 
+- create interfaces towards pettingzoo.. 
 
 ## dependencies
 
