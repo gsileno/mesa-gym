@@ -6,8 +6,8 @@ Infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios,
 
 The infrastructure consists of different modules:
 - the `mesa` part is about programming the environment and possibly hard-coding the agents: actions (and disabilities), what happens at performance, etc. When executed it makes change on the environment and returns relevant events;
-- the `gymnasium` environment collects the states and compute the rewards (typically from the events);
-- training methods work on top of the `gymnasium` environment.
+- custom `gymnasium` environments collect the states and compute the rewards (typically from the events);
+- training methods work on top of the `gymnasium` environments.
 
 ### Project structure
 
