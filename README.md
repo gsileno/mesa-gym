@@ -1,6 +1,6 @@
 # mesa-gym
 
-Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/), and providing custom environments for gymnasium (https://github.com/Farama-Foundation/Gymnasium), a common library for RL research and practice.  
+Minimal gym infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios, ...) based on the Mesa agent library for Python (https://mesa.readthedocs.io/en/latest/), and providing custom environments for gymnasium (https://github.com/Farama-Foundation/Gymnasium).
 
 ## Main components
 
