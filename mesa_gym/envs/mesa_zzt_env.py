@@ -29,7 +29,7 @@ class MesaZZTEnv(gym.Env):
         ```
     """
 
-    metadata = {"render_modes": ["human"], "render_fps": 4}
+    metadata = {"render_modes": ["human"], "render_fps": 25}
 
     def __init__(self, render_mode=None, map=None):
 
