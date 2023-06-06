@@ -1,8 +1,8 @@
 import os
 path = os.path.dirname(os.path.abspath(__file__))
 
-experiment_file = "zzt-qlearning_1000_0.01_1.0_0.002_0.1.pickle"
-view_fields = ["reward", "collided"]  # at least two fields, otherwise there are problems.
+experiment_file = "lumberjack-qlearning_1000_0.05_1.0_0.002_0.1.pickle"
+view_fields = ["reward", "failure"]  # at least two fields, otherwise there are problems.
 
 import pickle
 with open(f"{path}/{experiment_file}", "rb") as f:
