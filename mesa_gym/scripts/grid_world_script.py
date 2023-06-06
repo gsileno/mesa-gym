@@ -1,6 +1,5 @@
 # simple script to run the gridworld example from gymnasium
 
-# somehow it stopped working
 # import gymnasium as gym
 # env = gym.make('mesa_gym/GridWorld-v0', render_mode="human")
 
