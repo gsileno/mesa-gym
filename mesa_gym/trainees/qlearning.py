@@ -2,6 +2,7 @@ from collections import defaultdict
 import numpy as np
 
 class QLearningTrainee:
+
     def __init__(self, agent, action_space, learning_rate: float, initial_epsilon: float, epsilon_decay: float, final_epsilon: float, discount_factor: float = 0.95):
         """Initialize a Reinforcement Learning agent with an empty dictionary
         of state-action values (q_values), a learning rate and an epsilon."""

@@ -11,8 +11,8 @@ path = os.path.dirname(os.path.abspath(__file__))
 
 # add files here if you want to use a trained model # NOT WORKING NOW
 trained_models = {}
-# trained_models[35] = f"{path}/../trainees/trained_models/LionAgent_35_zzt-qlearning_1000_0.01_1.0_0.002_0.1.pickle"
-# trained_models[7] = f"{path}/../trainees/trained_models/RangerAgent_7_zzt-qlearning_1000_0.01_1.0_0.002_0.1.pickle"
+trained_models[35] = f"{path}/../trainees/trained_models/LionAgent_35_zzt-qlearning_100000_0.05_1.0_2e-05_0.1.pickle"
+trained_models[7] = f"{path}/../trainees/trained_models/RangerAgent_7_zzt-qlearning_100000_0.05_1.0_2e-05_0.1.pickle"
 
 # load q_tables to use them
 q_tables = {}

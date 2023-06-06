@@ -21,7 +21,7 @@ print(f"number of states: {nb_states}")
 
 # target of training
 
-n_episodes = 1000  # 100_000
+n_episodes = 100_000  # 100_000
 
 # create the trainee agent instances
 
@@ -68,7 +68,7 @@ data["fields"] = []
 
 from qlearning import QLearningTrainee
 
-learning_rate = 0.01
+learning_rate = 0.05
 start_epsilon = 1.0
 epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
 final_epsilon = 0.1

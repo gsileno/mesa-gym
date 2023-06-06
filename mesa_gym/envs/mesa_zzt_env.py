@@ -134,7 +134,9 @@ class MesaZZTEnv(gym.Env):
 
     def step(self, actions):
 
+        rewards = {}
         for agent in self.agents:
+            rewards[agent.unique_id] = -1 # for energy lost
             agent.next_action = self.potential_actions[actions[agent.unique_id]]
 
         self.events = {}
@@ -143,24 +145,25 @@ class MesaZZTEnv(gym.Env):
         if self.render_mode == "human":
             self._render_frame()
 
-        rewards = {}
         for agent, reached_entity in events:
             self.events[agent] = {}
             if reached_entity is False:
-                rewards[agent.unique_id] = -1
+                rewards[agent.unique_id] = -5
                 self.events[agent]["collided"] = 1
             else:
                 if type(agent) is mesa_zzt.LionAgent:
                     self.events[reached_entity] = {}
 
                     if type(reached_entity) is mesa_zzt.RangerAgent:
-                        rewards[agent.unique_id] = 10
+                        rewards[agent.unique_id] = 100
+                        rewards[reached_entity.unique_id] = -100
+
                         self.events[agent]["success"] = 1
                         self.events[reached_entity]["failure"] = 1
 
                 elif type(agent) is mesa_zzt.RangerAgent:
                     if type(reached_entity) is mesa_zzt.Diamond:
-                        rewards[agent.unique_id] = 10
+                        rewards[agent.unique_id] = 100
                         self.events[agent]["success"] = 1
 
         observation = self._get_obs()
