@@ -206,7 +206,7 @@ class AgentBody(mesa.Agent):
         self.react()
 
     def trace(self, text):
-        self.model.console.append(f"entity {self.unique_id} > {text}                                    ")
+        self.model.console.append(f"{type(self).__name__} {self.unique_id} > {text}                                    ")
 
     def destroy(self):
         pass
@@ -393,7 +393,7 @@ def create_world(map):
     y = 0
     for z, ch in enumerate(map):
         if width + 3 < z < len(map) - width - 3:
-            if 1 < z % (width + 3) < width + 1:
+            if 0 < z % (width + 3) <= width:
                 if ch == " ":
                     pass
                 else:
