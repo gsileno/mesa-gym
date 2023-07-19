@@ -6,79 +6,46 @@ Infrastructure for AI experiments (RL, ML, planning, BDI, multi-agent scenarios,
 
 The infrastructure consists of different modules:
 - the `mesa` part is about programming the environment and possibly hard-coding the agents: actions (and disabilities), what happens at performance, etc. When executed it maintains state, produces changes, and returns relevant events;
-- custom `gymnasium` environments collect the states and compute the rewards (typically from the events);
+- custom `gymnasium` environments collect the states and compute the rewards (typically from events);
 - training methods work on top of the `gymnasium` environments.
 
 ### Project structure
 
-structure of `mesa-gym`:
-- `/worlds`: worlds that runs on `mesa`. they can be executed standalone
-  - `mesa_zzt.py`: 2D grid world, characters are inspired by the old classic ZZT (https://museumofzzt.com/).
-  - `mesa_market.py`: a simple market with sale transactions (still in development, not working now)
-- `/envs`: custom environments for `gymnasium` relying on `mesa` worlds 
-  - `mesa_zzt_env.py`
-- `/scripts`: simple scripts that runs the worlds, possibly reusing trained models
-  - `mesa_zzt_script.py`
-- `/trainees`: RL methods to create agent models
-  - `/trained_models`: pre-trained models
-    - `mesa_zzt_trainee.py`: training batch for agents in `mesa_zzt` 
-    - `qlearning.py`: tabular q-learning agent
-  - `/training_data`: training data and visualizationn helpers
-    - `data_viz.py`: visualize variation of performance during training
+Structure of `mesa-gym` project:
+- `/gyms` contains various gyms built on top of MESA
+  - `/grid` contains grid-based symbolic worlds
+  - `/market` contains communication-centered (eg. markets) worlds
+  - `...`
+  - `/test` clones a simple environment (no MESA) from gym to test the integration with gymnasium
+- `/trainees` contains reusable agent learning modules
+- `/common` contains helpers, eg. for data visualization
+
+Conventionally, each `mesa-gym` world contains:
+- `world.py`: agent and environmental models that run on `mesa`. they can be executed standalone
+- `env.py`: custom environments for `gymnasium` building upon the world model
+- `script.py`: simple script that runs the world, possibly reusing trained models
+- `training.py`: learning script, creating behavioural models 
 
 ### Starting scripts
 
-To start, you can run (from within the `mesa_gym` directory)
+To start, you can run, from within a directory in `gyms`, eg. `grid/zzt_basic`
 
 - to execute a multi-agent world, using only `mesa`:
 ```
-python worlds/mesa_zzt.py
+python world.py 
 ``` 
 - to execute a multi-agent world, using a `gymnasium` custom environment on top of `mesa`, and possibly pre-trained models
 ```
-python scripts/mesa_zzt_script.py
+python script.py
 ``` 
-- to train lion(s) and ranger(s) in `mesa_zzt` using tabular q-learning within `gymnasium` 
+- to train agents within `gymnasium` 
 ```
-python trainees/mesa_zzt_trainee.py
+python training.py
 ```
 - to visualize (meta-)data produced during training
 ```
-python trainees/training_data/data_viz.py
+python data_viz.py
 ````
-
-## Available worlds  
-
-### ZZT-like 2D grid world
-
-The map of the target 2D environment is specified as a multi-line string.
-For instance:
-
-```
-map = """
-|--------------------|
-|                    |
-|  ██████            |
-|  █             ☺   |
-|  █                 |
-|  ██████            |
-|  ░░░░░█    ████████|
-|  ░░░░░█         Ω  |
-|  ██████            |
-|              ♦     |
-|                    |
-|--------------------|
-"""
-```
-
-The map shows:
-
-- a player `☺`, 
-- a lion `Ω`, which ends the game if it touches the player, 
-- some grass `░`, that grows in time, but is destroyed to some degree when someone walks on it
-- walls `█` (that blocks movement), a gem `♦` (the end goal).
-
-All components of the scene are agents handled by mesa.
 
 #### setup and execution
 

@@ -1,0 +1,27 @@
+----------------------------
+ characters inspired by ZZT
+----------------------------
+
+π tiger
+Ω lion
+Θ bear
+█ wall
+♦ diamond
+☺ person 
+☻ person 
+♣ ruffian
+♀ key
+◙ door
+ä ammo
+♂ bomb
+░ ▒ ▓ grass
+Γ tree
+σ fruit
+° bullet
+≡ portal
+♠ mushroom
+○ mailbox
+♥ energy
+■ ↨ ↔ objects that can be moved
+► ◄ ▲ ▼ objects that push
+¶ § ?
