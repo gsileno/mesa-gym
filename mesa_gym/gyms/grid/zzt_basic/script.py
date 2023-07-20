@@ -9,8 +9,10 @@ import pickle
 import os
 path = os.path.dirname(os.path.abspath(__file__))
 
-# add files here if you want to use a trained model # NOT WORKING NOW
+# add files here if you want to use a trained model
 trained_models = {}
+trained_models[7] = "models/RangerAgent_7_zzt-qlearning_1000_0.05_1.0_0.002_0.1.pickle"
+trained_models[35] = "models/LionAgent_35_zzt-qlearning_1000_0.05_1.0_0.002_0.1.pickle"
 
 # load q_tables to use them
 q_tables = {}
@@ -23,7 +25,7 @@ obs, info = env.reset()
 for _ in range(1000):
 
     actions = {}
-    for agent in env.agents:
+    for agent in env._get_agents():
         id = agent.unique_id
         if id in trained_models:
             action = int(np.argmax(q_tables[id][tuple(obs)]))

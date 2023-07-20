@@ -14,11 +14,8 @@ class MesaZZTEnv(gym.Env):
         All actions are just about moving; directions are provided by the MESA grid world
 
         ### Observation Space
-        The observation space consists of:
-        - a map with the idle objects
-        - for each moving agent, a value representing the agent's current position as current_row * n_cols + current_col.
-        - for each agent with state: an array of possible states
-        Therefore, the number of possible observations depends on the size of the map, the number of agents and of states.
+        The observation space consists of the perceptual space of each agent.
+        The perceptual space is the union of 9 cells array for each relevant item for the item, maintaining the strength
 
         ### Arguments
         ```
@@ -61,18 +58,15 @@ class MesaZZTEnv(gym.Env):
         self.potential_actions = mesa_zzt.AgentBody.get_directions()
         n_actions = len(self.potential_actions)
 
-        self.entities = self._get_entities()
-        self.agents = self._get_agents()
-
         self.observation_space = spaces.Dict()
         self.action_space = spaces.Dict()
 
         self.events = {}
 
-        for entity in self.entities:
+        for entity in self._get_entities():
             self.observation_space[entity.unique_id] = spaces.Discrete(n_positions)
 
-        for agent in self.agents:
+        for agent in self._get_agents():
             self.action_space[agent.unique_id] = spaces.Discrete(n_actions)
 
     def _get_world(self):
@@ -82,26 +76,19 @@ class MesaZZTEnv(gym.Env):
         return self.model.entities
 
     def _get_agents(self):
-        lions = []
-        grass_zones = []
-        rangers = []
+        agents = []
 
         for entity in self.model.entities:
-            if type(entity) is mesa_zzt.LionAgent:
-                lions.append(entity)
-            elif type(entity) is mesa_zzt.Grass:
-                grass_zones.append(entity)
-            elif type(entity) is mesa_zzt.RangerAgent:
-                rangers.append(entity)
-
-        return lions + rangers
+            if type(entity) is mesa_zzt.LionAgent or type(entity) is mesa_zzt.RangerAgent:
+                agents.append(entity)
+        return agents
 
     def _get_obs(self):
-        return { entity.unique_id: entity.pos for entity in self.entities }
+        return { agent.unique_id: agent.get_percepts() for agent in self._get_agents() }
 
     def _get_info(self):
         info = {}
-        for agent in self.agents:
+        for agent in self._get_agents():
             if agent.unique_id not in info:
                 info[agent.unique_id] = {}
             info[agent.unique_id]["energy"] = agent.energy
@@ -123,17 +110,42 @@ class MesaZZTEnv(gym.Env):
             self.view.init()
             self.view.show()
 
-        self.agents = self._get_agents()
         observation = self._get_obs()
         info = self._get_info()
 
         return observation, info
 
-    def step(self, actions):
+    def _get_rewards(self, events):
 
         rewards = {}
-        for agent in self.agents:
-            rewards[agent.unique_id] = -1 # for energy lost
+
+        for agent in self._get_agents():
+            rewards[agent.unique_id] = -1               # losing energy for each time step
+
+        for agent, reached_entity in events:
+            self.events[agent] = {}
+            if reached_entity is False:                 # collision with wall
+                rewards[agent.unique_id] = -5
+                self.events[agent]["collided"] = 1
+            else:
+                if type(agent) is mesa_zzt.LionAgent:   # lion eats the ranger
+                    self.events[reached_entity] = {}
+                    if type(reached_entity) is mesa_zzt.RangerAgent:
+                        rewards[agent.unique_id] = 100
+                        rewards[reached_entity.unique_id] = -100
+                        self.events[agent]["success"] = 1
+                        self.events[reached_entity]["failure"] = 1
+                elif type(agent) is mesa_zzt.RangerAgent: # ranger finds diamond
+                    if type(reached_entity) is mesa_zzt.Diamond:
+                        rewards[agent.unique_id] = 100
+                        self.events[agent]["success"] = 1
+
+        return rewards
+
+
+    def step(self, actions):
+
+        for agent in self._get_agents():
             agent.next_action = self.potential_actions[actions[agent.unique_id]]
 
         self.events = {}
@@ -142,27 +154,7 @@ class MesaZZTEnv(gym.Env):
         if self.render_mode == "human":
             self._render_frame()
 
-        for agent, reached_entity in events:
-            self.events[agent] = {}
-            if reached_entity is False:
-                rewards[agent.unique_id] = -5
-                self.events[agent]["collided"] = 1
-            else:
-                if type(agent) is mesa_zzt.LionAgent:
-                    self.events[reached_entity] = {}
-
-                    if type(reached_entity) is mesa_zzt.RangerAgent:
-                        rewards[agent.unique_id] = 100
-                        rewards[reached_entity.unique_id] = -100
-
-                        self.events[agent]["success"] = 1
-                        self.events[reached_entity]["failure"] = 1
-
-                elif type(agent) is mesa_zzt.RangerAgent:
-                    if type(reached_entity) is mesa_zzt.Diamond:
-                        rewards[agent.unique_id] = 100
-                        self.events[agent]["success"] = 1
-
+        rewards = self._get_rewards(events)
         observation = self._get_obs()
         info = self._get_info()
 

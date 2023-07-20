@@ -143,22 +143,48 @@ class AgentBody(mesa.Agent):
         return directions
 
     def get_percepts(self):
+
+        if self.pos is None: # case in which the agent has been destroyed # TODO, get percepts should not be called in this case!
+            return []
+
         cells = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-        percepts = {}
+
+        relevant_entities = self._get_relevant_entities()
+
+        if relevant_entities is None:
+            raise RuntimeWarning("An agent has been initialized not paying attention to any entity.")
+
+        percepts_about = {}
+        for entity_type in relevant_entities:
+            percepts_about[entity_type] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        absx, absy = self.pos
+
+
         for pos in cells:
-            absx, absy = self.pos
-            x, y = pos
-            dx = x - absx
-            dy = y - absy
-            if dx == self.model.width - 1:
-                dx = -1
-            elif dx == 1 - self.model.width:
-                dx = 1
-            if dy == self.model.height - 1:
-                dy = -1
-            elif dy == 1 - self.model.height:
-                dy = 1
-            percepts[(dx, dy)] = self.model.grid.get_cell_list_contents([pos])
+            x, y = pos; dx = x - absx; dy = y - absy
+            if dx == self.model.width - 1: dx = -1
+            elif dx == 1 - self.model.width: dx = 1
+            if dy == self.model.height - 1: dy = -1
+            elif dy == 1 - self.model.height: dy = 1
+            dx += 1; dy += 1
+
+            strength_concerning = {}
+            for entity_type in relevant_entities:
+                strength_concerning[entity_type] = 0
+
+            for item in self.model.grid.get_cell_list_contents([pos]):
+                entity_type = type(item)
+                if entity_type in relevant_entities:
+                    strength_concerning[entity_type] += 1
+
+            for entity_type in relevant_entities:
+                percepts_about[entity_type][dx*3 + dy] = strength_concerning[entity_type]
+
+        percepts = []
+        for entity_type in relevant_entities:
+            percepts += percepts_about[entity_type]
+
         return percepts
 
     def react(self):
@@ -214,11 +240,15 @@ class AgentBody(mesa.Agent):
     def mental_init(self):
         self.next_action = None
 
+    def _get_relevant_entities(self):
+        return None
+
     def mental_step(self):
-        # percepts = self.get_percepts()
+        percepts = self.get_percepts()
+        # self.trace(f"percepts: {percepts}")
         if self.next_action is None:
             self.next_action = self.random.choice(self.get_directions())
-        self.trace(f"next action {self.next_action}")
+        self.trace(f"next action: {self.next_action}")
         self.move(self.next_action)
         self.next_action = None
 
@@ -236,6 +266,9 @@ class RangerAgent(AgentBody):
         super().__init__(unique_id, model, position)
         self.model.add_disability(RangerAgent, "move", self.get_pos)
 
+    def _get_relevant_entities(self):
+        return [LionAgent, Diamond, Wall]
+
     def show(self):
         return str(Symbol.ALICE)
 
@@ -249,6 +282,9 @@ class LionAgent(AgentBody):
     def __init__(self, unique_id, model, position):
         super().__init__(unique_id, model, position)
         self.model.add_disability(LionAgent, "move", self.get_pos)
+
+    def _get_relevant_entities(self):
+        return [RangerAgent, Wall]
 
     def show(self):
         return str(Symbol.LION)
