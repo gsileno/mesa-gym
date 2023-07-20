@@ -1,6 +1,6 @@
 # ZZT-like 2D grid world
 
-This game is inspired by the old classic ZZT, one of the first shareware, whose success brought to a sequence of event going towards the Unity platform.
+This game is inspired by the old classic ZZT, one of the first shareware, whose success was the beginning of a series of events bringing up to the development of the Unity platform.
 
 The map of the target 2D environment can be specified (and visualized) as a multi-line string.
 

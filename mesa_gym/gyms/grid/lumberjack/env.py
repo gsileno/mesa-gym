@@ -1,3 +1,5 @@
+import math
+
 import mesa_gym.gyms.grid.lumberjack.world as mesa_lumberjack
 import gymnasium as gym
 from gymnasium import spaces
@@ -31,7 +33,7 @@ class MesaLumberjackEnv(gym.Env):
 
     metadata = {"render_modes": ["human"], "render_fps": 25}
 
-    def __init__(self, render_mode=None, map=None, value_dimension=None):
+    def __init__(self, render_mode=None, map=None, value_dim=None):
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
@@ -39,10 +41,7 @@ class MesaLumberjackEnv(gym.Env):
         if self.render_mode == "human":
             self.fps = self.metadata["render_fps"]
 
-        if value_dimension is None:
-            self.value_dimension = 1
-        else:
-            self.value_dimension = value_dimension
+        self.value_dim = value_dim
 
         self.map = map
         self.model = self._get_world()
@@ -76,23 +75,29 @@ class MesaLumberjackEnv(gym.Env):
 
     def _get_world(self):
         if self.map is None:
-            return mesa_lumberjack.create_random_world(5, 5,
+            import random
+            width = random.randint(5, 5)
+            height = random.randint(5, 5)
+            size = width*height
+            n_strength1trees = random.randint(1, int(math.sqrt(size)/2 + 1))
+            n_strength2trees = random.randint(1, int(math.sqrt(size)/2 + 1))
+            return mesa_lumberjack.create_random_world(width, height,
                                                        {mesa_lumberjack.WeakLumberjack: 1,
                                                         mesa_lumberjack.StrongLumberjack: 1,
-                                                        mesa_lumberjack.Strength1Tree: 3,
-                                                        mesa_lumberjack.Strength2Tree: 3})
+                                                        mesa_lumberjack.Strength1Tree: n_strength1trees,
+                                                        mesa_lumberjack.Strength2Tree: n_strength2trees})
 
         else:
-            # map = """
-            # |-----|
-            # |2  2 |
-            # |1   2|
-            # |  ☺  |
-            # |1 ☻  |
-            # | 1   |
-            # |-----|
-            # """
-            return mesa_lumberjack.load_world(self.map)
+            map = """
+            |-----|
+            |2  2 |
+            |1   2|
+            |  ☺  |
+            |1 ☻  |
+            | 1   |
+            |-----|
+            """
+            return mesa_lumberjack.load_world(map)
 
     def _get_entities(self):
         return self.model.entities
@@ -137,34 +142,48 @@ class MesaLumberjackEnv(gym.Env):
 
         return observations, infos
 
-    def step(self, actions):
+    def _get_rewards(self, events):
 
-        rewards = {}
-        for agent in self.agents:
-            agent.next_action = self.potential_actions[actions[agent.unique_id]]
+        if self.value_dim is None:
+            return {}
+        else:
+            value_dim = self.value_dim
 
         self.events = {}
-        terminated, events = self.model.step()
-
-        if self.render_mode == "human":
-            self._render_frame()
+        rewards = {}
 
         for agent, tree in events:
+
             self.events[agent] = {}
             if tree is False:
                 self.events[agent]["failure"] = 1
             else:
                 self.events[agent]["success"] = 1
-                if self.value_dimension == 1:
-                    rewards[agent.unique_id] = 1  # selfishness
-                elif self.value_dimension == 2:
+                if value_dim == "selfishness":
+                    rewards[agent.unique_id] = 1
+                elif value_dim == "altruism":
                     for other in self.agents:
                         if other != agent:
-                            rewards[other.unique_id] = 1  # altruism
-                elif self.value_dimension == 3:
+                            rewards[other.unique_id] = 1
+                elif value_dim == "environmentalism":
                     if self.model.ntrees == 0:
-                        rewards[agent.unique_id] = -1  # environmentalism
+                        rewards[agent.unique_id] = -1
+                else:
+                    raise RuntimeError(f"Unknown value dimension '{value_dim}'.")
 
+        return rewards
+
+    def step(self, actions):
+
+        for agent in self.agents:
+            agent.next_action = self.potential_actions[actions[agent.unique_id]]
+
+        terminated, events = self.model.step()
+
+        if self.render_mode == "human":
+            self._render_frame()
+
+        rewards = self._get_rewards(events)
         observations = self._get_obs()
         infos = self._get_info()
 

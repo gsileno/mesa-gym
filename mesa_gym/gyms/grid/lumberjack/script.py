@@ -15,9 +15,9 @@ import pickle
 
 def load_trained_models(trained_models):
     q_tables = {}
-    for id in trained_models.keys():
-        with open(trained_models[id], "rb") as f:
-            q_tables[id] = pickle.load(f)
+    for agent_type in trained_models.keys():
+        with open(trained_models[agent_type], "rb") as f:
+            q_tables[agent_type] = pickle.load(f)
     return q_tables
 
 # load q_tables from trained models
@@ -26,13 +26,14 @@ q_tables = load_trained_models(trained_models)
 # start environment
 observations, info = env.reset()
 
-for _ in range(1000):
+for _ in range(100):
     actions = {}
     for agent in env.agents:
         id = agent.unique_id
+        agent_type = type(agent).__name__
         observation = tuple(observations[id])
-        if id in trained_models:
-            action = int(np.argmax(q_tables[id][observation]))
+        if agent_type in trained_models:
+            action = int(np.argmax(q_tables[agent_type][observation]))
         else:
             action = env.action_space[id].sample()
         actions[id] = action

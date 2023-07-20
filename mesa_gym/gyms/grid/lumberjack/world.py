@@ -227,7 +227,7 @@ class WorldView:
         move(0, 0)
         print("mesagym -- minimal gym built on top on mesa\n")
 
-    def show(self, reversed=False):
+    def show(self, reverse_order=False):
         self.header()
         string = ""
 
@@ -265,7 +265,7 @@ class WorldView:
 
         print(">>> console <<<")
 
-        if reversed:
+        if reverse_order:
             console = reversed(self.world.console[-5:])
         else:
             console = self.world.console[-5:]
@@ -343,9 +343,9 @@ def load_world(map):
     return model
 
 # create a random map
-def create_random_world(width, height, entities_dict):
+def create_random_world(height, width, entities_dict):
 
-    model = WorldModel(height, width)
+    model = WorldModel(width, height)
 
     entity_types = entities_dict.keys()
     entities = []
@@ -359,7 +359,9 @@ def create_random_world(width, height, entities_dict):
 
     x = 0; y = 0
     while y < height and x < width:
-        generated_map_size = x + y*height
+        generated_map_size = x + y*width
+        if len(entities) == 0:
+            break
         prob = len(entities)/(map_size - generated_map_size)
         if random.random() <= prob:
             selected = random.randint(0, len(entities) - 1)
@@ -379,29 +381,28 @@ def create_random_world(width, height, entities_dict):
 if __name__ == "__main__":
 
     map = """
-|-----|
-|2  2 |
-|1   2|
-|  ☺  |
-|1 ☻  |
-| 1   |
-|-----|
+|------|
+|2   2 |
+|1    2|
+|   ☺  |
+|1 ☻   |
+| 1    |
+|------|
 """
-    model = load_world(map)
+    # model = load_world(map)
 
-    # model = create_random_world(5, 5, { WeakLumberjack: 1, StrongLumberjack: 1, Strength1Tree: 3, Strength2Tree: 3 })
+    model = create_random_world(40, 10, { WeakLumberjack: 1, StrongLumberjack: 1, Strength1Tree: 3, Strength2Tree: 7 })
 
     view = WorldView(model)
     view.init()
     view.show()
 
     MAX = 100
-    n = 0
-    while n < MAX:
+    for n in range(MAX):
         end, events = model.step()
         view.show()
         if end:
             break
         n += 1
-    if n == MAX:
-        print("Max number of steps reached. <<<<<<")
+        if n == MAX:
+            print("Max number of steps reached. <<<<<<")
