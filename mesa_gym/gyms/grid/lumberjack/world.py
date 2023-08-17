@@ -52,29 +52,29 @@ class Lumberjack(mesa.Agent):
                 directions.append((i, j))
         return directions
 
-    def get_percepts(self):
-        cells = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
-        percepts_about_trees = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        percepts_about_agents = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for pos in cells:
-            absx, absy = self.pos
-            x, y = pos; dx = x - absx; dy = y - absy
-            if dx == self.model.width - 1: dx = -1
-            elif dx == 1 - self.model.width: dx = 1
-            if dy == self.model.height - 1: dy = -1
-            elif dy == 1 - self.model.height: dy = 1
-            dx += 1; dy += 1
-            tree_total_strength = 0
-            agent_total_strength = 0
-            for item in self.model.grid.get_cell_list_contents([pos]):
-                if isinstance(item, Tree):
-                    tree_total_strength += item.strength
-                elif isinstance(item, Lumberjack):
-                    agent_total_strength += item.strength
-            percepts_about_trees[dx*3 + dy] = tree_total_strength
-            percepts_about_agents[dx*3 + dy] = agent_total_strength
+    def get_percepts(self, radius=3):
+        # cells = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True)
 
-        return  percepts_about_agents + percepts_about_trees
+        # diameter = radius * 2 + 1
+        # array_size = diameter ** 2
+        percepts_about_trees = []
+        percepts_about_agents = []
+
+        for dx in range(-radius, radius+1):
+            for dy in range(-radius, radius+1):
+                absx, absy = self.pos
+                x = (absx + dx) % self.model.width
+                y = (absy + dy) % self.model.height
+                tree_total_strength = 0
+                agent_total_strength = 0
+                for item in self.model.grid.get_cell_list_contents((x, y)):
+                    if isinstance(item, Tree):
+                        tree_total_strength += item.strength
+                    elif isinstance(item, Lumberjack):
+                        agent_total_strength += item.strength
+                percepts_about_trees.append(tree_total_strength)
+                percepts_about_agents.append(agent_total_strength)
+        return percepts_about_agents + percepts_about_trees
 
     def react(self):
         elems = self.model.grid.get_cell_list_contents([self.pos])
