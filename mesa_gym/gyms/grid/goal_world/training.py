@@ -18,7 +18,7 @@ nb_states = gym.spaces.flatdim(env.observation_space)
 print(f"number of states: {nb_states}")
 
 # target of training
-n_episodes = 1_000  # 100_000
+n_episodes = 10_000  # 100_000
 
 # create the trainee agent instances
 
@@ -86,8 +86,6 @@ def q_learning():
 
 
 experiment_name, trainees = q_learning()
-
-q_table = trainees[0].q_table()
 
 import pickle
 for trainee in trainees:
