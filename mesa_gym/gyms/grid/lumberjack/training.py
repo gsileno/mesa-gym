@@ -27,7 +27,7 @@ for mesa_agent in env.agents:
 
 # target of training
 
-n_episodes = 1_000  # 100_000
+n_episodes = 500  # 100_000
 
 # create the trainee agent instances
 

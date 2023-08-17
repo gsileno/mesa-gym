@@ -1,4 +1,5 @@
 import math
+import random
 
 import mesa_gym.gyms.grid.lumberjack.world as mesa_lumberjack
 import gymnasium as gym
@@ -58,10 +59,6 @@ class MesaLumberjackEnv(gym.Env):
         # a 3x3 grid with the sum of strengths of nearby trees and a 3x3 grid with sum of strengths of nearby agents
         # the two grids are encoded in a 9*2 vector
         # we assume a max value of 2
-        n_features = 9 * 2
-        features_high = np.array([2] * n_features, dtype=np.float32)
-        features_low = np.array([0] * n_features, dtype=np.float32)
-
         self.entities = self._get_entities()
         self.agents = self._get_agents()
         self.events = {}
@@ -69,23 +66,24 @@ class MesaLumberjackEnv(gym.Env):
         self.observation_space = spaces.Dict()
         self.action_space = spaces.Dict()
 
+        MIN = 0; MAX = 2
         for agent in self.agents:
+            n_features = len(agent.get_percepts()) * (MAX - MIN)
+            features_high = np.array([MAX] * n_features, dtype=np.float32)
+            features_low = np.array([MIN] * n_features, dtype=np.float32)
             self.action_space[agent.unique_id] = spaces.Discrete(n_actions)
             self.observation_space[agent.unique_id] = spaces.Box(features_high, features_low)
 
     def _get_world(self):
         if self.map is None:
-            import random
-            width = random.randint(5, 5)
-            height = random.randint(5, 5)
-            size = width*height
-            n_strength1trees = random.randint(1, int(math.sqrt(size)/2 + 1))
-            n_strength2trees = random.randint(1, int(math.sqrt(size)/2 + 1))
-            return mesa_lumberjack.create_random_world(width, height,
-                                                       {mesa_lumberjack.WeakLumberjack: 1,
-                                                        mesa_lumberjack.StrongLumberjack: 1,
-                                                        mesa_lumberjack.Strength1Tree: n_strength1trees,
-                                                        mesa_lumberjack.Strength2Tree: n_strength2trees})
+            width = random.randrange(30, 40)
+            height = random.randrange(5, 10)
+            return mesa_lumberjack.create_random_world(width, height, {
+                mesa_lumberjack.WeakLumberjack: 1,
+                mesa_lumberjack.StrongLumberjack: 1,
+                mesa_lumberjack.Strength1Tree: 3,
+                mesa_lumberjack.Strength2Tree: 7 }
+            )
 
         else:
             map = """

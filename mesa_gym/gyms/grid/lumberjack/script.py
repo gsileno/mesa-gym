@@ -3,6 +3,8 @@
 # add filenames to this dict if you want to use a trained model for some entities
 # eg. trained_models[id] = "<FILENAME.pickle>"
 trained_models = {}
+trained_models["StrongLumberjack"] = "models/StrongLumberjack_lumberjack-qlearning_selfishness_500_0.05_1.0_0.004_0.1.pickle"
+trained_models["WeakLumberjack"] = "models/WeakLumberjack_lumberjack-qlearning_selfishness_500_0.05_1.0_0.004_0.1.pickle"
 
 import mesa_gym.gyms.grid.lumberjack.env as e
 env = e.MesaLumberjackEnv(render_mode="human")
@@ -33,7 +35,11 @@ for _ in range(100):
         agent_type = type(agent).__name__
         observation = tuple(observations[id])
         if agent_type in trained_models:
-            action = int(np.argmax(q_tables[agent_type][observation]))
+            if observation not in q_tables[agent_type]:
+                action = env.action_space[id].sample()
+                agent.trace("UNKNOWN CONDITION in my Qtable: random extraction")
+            else:
+                action = int(np.argmax(q_tables[agent_type][observation]))
         else:
             action = env.action_space[id].sample()
         actions[id] = action
