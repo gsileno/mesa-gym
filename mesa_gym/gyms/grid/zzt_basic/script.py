@@ -36,7 +36,7 @@ for _ in range(1000):
     obs, reward, terminated, truncated, info = env.step(actions=actions)
 
     if terminated or truncated:
-        observation, info = env.reset()
+        obs, info = env.reset()
 
 env.close()
 

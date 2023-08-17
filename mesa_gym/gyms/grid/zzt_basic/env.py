@@ -1,6 +1,7 @@
 # zzt-like gridworld as environment for gymnasium
 
 import mesa_gym.gyms.grid.zzt_basic.world as mesa_zzt
+import numpy as np
 
 import gymnasium as gym
 from gymnasium import spaces
@@ -53,21 +54,23 @@ class MesaZZTEnv(gym.Env):
         self.model = self._get_world()
         self.booting = True
 
-        n_positions = self.model.width * self.model.height
-
         self.potential_actions = mesa_zzt.AgentBody.get_directions()
         n_actions = len(self.potential_actions)
 
         self.observation_space = spaces.Dict()
         self.action_space = spaces.Dict()
 
+        self.entities = self._get_entities()
+        self.agents = self._get_agents()
         self.events = {}
 
-        for entity in self._get_entities():
-            self.observation_space[entity.unique_id] = spaces.Discrete(n_positions)
-
-        for agent in self._get_agents():
+        MIN = 0; MAX = 2
+        for agent in self.agents:
+            n_features = len(agent.get_percepts()) * (MAX - MIN)
+            features_high = np.array([MAX] * n_features, dtype=np.float32)
+            features_low = np.array([MIN] * n_features, dtype=np.float32)
             self.action_space[agent.unique_id] = spaces.Discrete(n_actions)
+            self.observation_space[agent.unique_id] = spaces.Box(features_high, features_low)
 
     def _get_world(self):
         return mesa_zzt.create_world(self.map)
@@ -77,7 +80,6 @@ class MesaZZTEnv(gym.Env):
 
     def _get_agents(self):
         agents = []
-
         for entity in self.model.entities:
             if type(entity) is mesa_zzt.LionAgent or type(entity) is mesa_zzt.RangerAgent:
                 agents.append(entity)
