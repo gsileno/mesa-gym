@@ -11,7 +11,13 @@ path = os.path.dirname(os.path.abspath(__file__))
 
 # add files here if you want to use a trained model
 trained_models = {}
-trained_models[0] = "models/Mouse_0_goal_world-qlearning_1000_0.05_1.0_0.002_0.1.pickle"
+trained_models[0] = "models/Mouse_0_goal_world-qlearning_10000_0.05_1.0_0.0002_0.1.pickle"
+
+# load q_tables to use them
+q_tables = {}
+for id in trained_models.keys():
+    with open(trained_models[id], "rb") as f:
+        q_tables[id] = pickle.load(f)
 
 # load q_tables to use them
 q_tables = {}
@@ -20,9 +26,6 @@ for id in trained_models.keys():
         q_tables[id] = pickle.load(f)
 
 obs, info = env.reset()
-
-print(obs)
-
 n_games = 0
 
 for _ in range(100):
@@ -31,6 +34,8 @@ for _ in range(100):
     for agent in env._get_agents():
         id = agent.unique_id
         if id in trained_models:
+            if tuple(obs) not in q_tables[id]:
+                raise RuntimeError("Warning: state not present in the Q-table, have you loaded the correct one?")
             action = int(np.argmax(q_tables[id][tuple(obs)]))
         else:
             action = env.action_space[id].sample()
@@ -39,7 +44,7 @@ for _ in range(100):
     obs, reward, terminated, truncated, info = env.step(actions=actions)
 
     if terminated or truncated:
-        observation, info = env.reset()
+        obs, info = env.reset()
         n_games += 1
 
 env.close()

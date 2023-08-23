@@ -125,7 +125,6 @@ class MesaGoalEnv(gym.Env):
         return observation, info
 
     def _get_rewards(self, events):
-
         rewards = {}
 
         # for agent in self._get_agents():

@@ -53,6 +53,9 @@ for _ in range(100):
     for agent in env._get_agents():
         id = agent.unique_id
 
+        if tuple(obs) not in q_tables[id]:
+            raise RuntimeError("Warning: state not present in the Q-table, have you loaded the correct one?")
+
         # create empty charts for each agent
         if id not in charts_best_actions:
             charts_best_actions[id] = {}

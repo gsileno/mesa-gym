@@ -204,7 +204,7 @@ class WorldModel(mesa.Model):
         positions = {}
         size = self.width * self.height
         for entity in self.entities:
-            entity_type = type(entity)
+            entity_type = str(type(entity))
             if entity_type not in positions:
                 positions[entity_type] = []
                 for _ in range(size):
@@ -213,9 +213,10 @@ class WorldModel(mesa.Model):
             if entity.pos is not None:
                 x, y = entity.pos
                 positions[entity_type][y * self.width + x] += 1
+                # print(f"position of {entity_type} is {(x, y)}")
 
         flat_positions = []
-        for entity_type in positions.keys():
+        for entity_type in sorted([str(k) for k in positions.keys()]):
             flat_positions += positions[entity_type]
 
         return flat_positions
@@ -375,20 +376,19 @@ if __name__ == "__main__":
 |--------------------|
 """
 
-    map = """
-|---|
-|  ☺|
-|   |
-| ♠ |
-|   |
-|---|
-"""
+#     map = """
+# |---|
+# |  ☺|
+# |   |
+# | ♠ |
+# |   |
+# |---|
+# """
 
     model = create_world(map)
     view = WorldView(model)
     view.init()
     view.show()
-    exit(1)
 
     while True:
         end, events = model.step()
