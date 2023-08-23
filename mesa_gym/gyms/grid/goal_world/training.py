@@ -38,12 +38,13 @@ def q_learning():
     start_epsilon = 1.0
     epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
     final_epsilon = 0.1
+    discount_factor = 0.95
 
-    experiment_name = f"goal_world-qlearning_{n_episodes}_{learning_rate}_{start_epsilon}_{epsilon_decay}_{final_epsilon}"
+    experiment_name = f"goal_world-qlearning_{n_episodes}_{learning_rate}_{discount_factor}_{start_epsilon}_{epsilon_decay}_{final_epsilon}"
 
     trainees = {}
     for agent in agents:
-        trainees[agent] = QLearningTrainee(agent=agent, action_space=env.action_space[agent], learning_rate=learning_rate, initial_epsilon=start_epsilon, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
+        trainees[agent] = QLearningTrainee(agent=agent, action_space=env.action_space[agent], learning_rate=learning_rate, initial_epsilon=start_epsilon, discount_factor=discount_factor, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
 
     for episode in tqdm(range(n_episodes)):
         obs, info = env.reset()

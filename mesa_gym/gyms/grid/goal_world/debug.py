@@ -26,7 +26,8 @@ action2symbol = {
 
 # add files here if you want to use a trained model
 trained_models = {}
-trained_models[0] = "models/Mouse_0_goal_world-qlearning_10000_0.05_1.0_0.0002_0.1.pickle"
+trained_models[0] = "models/Mouse_0_goal_world-qlearning_10000_0.05_0.95_1.0_0.0002_0.1.pickle"
+# trained_models[0] = "models/Mouse_0_goal_world-qlearning_10000_0.05_0.5_1.0_0.0002_0.1.pickle"
 
 # load q_tables to use them
 q_tables = {}
