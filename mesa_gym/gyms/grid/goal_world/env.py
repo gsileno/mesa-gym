@@ -72,13 +72,14 @@ class MesaGoalEnv(gym.Env):
 
         size = self.model.width * self.model.height
 
-        MIN = 0; MAX = 1
         for agent in self.agents:
-            n_features = size * (MAX - MIN)
-            features_high = np.array([MAX] * n_features, dtype=np.float32)
-            features_low = np.array([MIN] * n_features, dtype=np.float32)
             self.action_space[agent.unique_id] = spaces.Discrete(n_actions)
-            self.observation_space = spaces.Box(features_high, features_low)
+
+        MIN = 0; MAX = 1
+        n_features = size * (MAX - MIN) * len(self.entities)
+        features_high = np.array([MAX] * n_features, dtype=np.float32)
+        features_low = np.array([MIN] * n_features, dtype=np.float32)
+        self.observation_space = spaces.Box(features_low, features_high)
 
     def _get_world(self):
         return w.create_world(self.map)
