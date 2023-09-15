@@ -77,7 +77,7 @@ data["fields"] = []
 # q-learning
 #####################################
 
-from mesa_gym.trainees.qlearning import QLearningTrainee
+from mesa_gym.trainers.qlearning import QLearningTrainer
 
 learning_rate = 0.05
 start_epsilon = 1.0
@@ -88,7 +88,7 @@ experiment_name = f"lumberjack-qlearning_{VALUE_DIMENSION}_{n_episodes}_{learnin
 
 trainees = {}
 for agent_type in agent_types:
-    trainees[agent_type] = QLearningTrainee(agent=agent_type, action_space=env.action_space[agent_type_to_id[agent_type]], learning_rate=learning_rate, initial_epsilon=start_epsilon, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
+    trainees[agent_type] = QLearningTrainer(agent=agent_type, action_space=env.action_space[agent_type_to_id[agent_type]], learning_rate=learning_rate, initial_epsilon=start_epsilon, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
 
 for episode in tqdm(range(n_episodes)):
     observations, info = env.reset()
@@ -108,7 +108,7 @@ for episode in tqdm(range(n_episodes)):
         actions = {}
         for agent_type in agent_types:
             id = agent_type_to_id[agent_type]
-            actions[id] = trainees[agent_type].get_action(observations[id])
+            actions[id] = trainees[agent_type].select_action(observations[id])
 
         next_observations, rewards, terminated, truncated, info = env.step(actions)
 

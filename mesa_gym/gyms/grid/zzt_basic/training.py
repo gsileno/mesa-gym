@@ -67,7 +67,7 @@ def vanilla_learning():
 ######################################
 
 def q_learning():
-    from mesa_gym.trainees.qlearning import QLearningTrainee
+    from mesa_gym.trainers.qlearning import QLearningTrainer
 
     learning_rate = 0.05
     start_epsilon = 1.0
@@ -78,7 +78,7 @@ def q_learning():
 
     trainees = {}
     for agent in agents:
-        trainees[agent] = QLearningTrainee(agent=agent, action_space=env.action_space[agent], learning_rate=learning_rate, initial_epsilon=start_epsilon, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
+        trainees[agent] = QLearningTrainer(agent=agent, action_space=env.action_space[agent], learning_rate=learning_rate, initial_epsilon=start_epsilon, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
 
     for episode in tqdm(range(n_episodes)):
         obs, info = env.reset()
@@ -90,7 +90,7 @@ def q_learning():
         while not done:
             actions = {}
             for agent in agents:
-                actions[agent] = trainees[agent].get_action(obs)
+                actions[agent] = trainees[agent].select_action(obs)
             next_obs, rewards, terminated, truncated, info = env.step(actions)
 
             # collect data
