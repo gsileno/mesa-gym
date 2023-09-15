@@ -1,7 +1,7 @@
 from collections import defaultdict
 import numpy as np
 
-class QLearningTrainee:
+class QLearningTrainer:
 
     def __init__(self, agent, action_space, learning_rate: float, initial_epsilon: float, epsilon_decay: float, final_epsilon: float, discount_factor: float = 0.95):
         """Initialize a Reinforcement Learning agent with an empty dictionary
@@ -21,7 +21,7 @@ class QLearningTrainee:
 
         self.training_error = []
 
-    def get_action(self, obs) -> int:
+    def select_action(self, obs) -> int:
         """Returns the best action with probability (1 - epsilon)
         otherwise a random action with probability epsilon to ensure exploration."""
 
