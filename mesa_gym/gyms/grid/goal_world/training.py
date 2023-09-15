@@ -1,11 +1,11 @@
 import os
+
 path = os.path.dirname(os.path.abspath(__file__))
 
 # load the target environment
 import mesa_gym.gyms.grid.goal_world.env as w
-env = w.MesaGoalEnv(render_mode=None)
 
-import gymnasium as gym
+env = w.MesaGoalEnv(render_mode=None)
 
 agents = []
 type_agent = {}
@@ -13,38 +13,131 @@ for mesa_agent in env._get_agents():
     agents.append(mesa_agent.unique_id)
     type_agent[mesa_agent.unique_id] = type(mesa_agent).__name__
 
-# take the number of dimensions
-nb_states = gym.spaces.flatdim(env.observation_space)
-print(f"number of states: {nb_states}")
-
 # target of training
 n_episodes = 10_000  # 100_000
 
-# create the trainee agent instances
+# create the trainer instances
 
 from tqdm import tqdm
 
 data = {}
 data["fields"] = []
 
+
+def dqn_learning():
+    from mesa_gym.trainers.DQN import DQNTrainer, device
+    import torch
+    from itertools import count
+
+    # BATCH_SIZE is the number of transitions sampled from the replay buffer
+    # GAMMA is the discount factor as mentioned in the previous section
+    # EPS_START is the starting value of epsilon
+    # EPS_END is the final value of epsilon
+    # EPS_DECAY controls the rate of exponential decay of epsilon, higher means a slower decay
+    # TAU is the update rate of the target network
+    # LR is the learning rate of the AdamW optimizer
+    replay_batch_size = 128
+    discount_factor = 0.99
+    start_epsilon = 0.9
+    final_epsilon = 0.05
+    epsilon_decay = start_epsilon / (n_episodes / 2)
+    update_rate = 0.005
+    learning_rate = 1e-4
+
+    experiment_name = f"goal_world-DQNlearning_{n_episodes}_{replay_batch_size}_{update_rate}_{learning_rate}_{discount_factor}_{start_epsilon}_{epsilon_decay}_{final_epsilon}"
+
+    trainers = {}
+    for agent in agents:
+        trainers[agent] = DQNTrainer(agent=agent,
+                                     observation_space=env.observation_space,
+                                     action_space=env.action_space[agent],
+                                     replay_batch_size=replay_batch_size,
+                                     discount_factor=discount_factor,
+                                     initial_epsilon=start_epsilon,
+                                     final_epsilon=final_epsilon,
+                                     epsilon_decay=epsilon_decay,
+                                     update_rate=update_rate,
+                                     learning_rate=learning_rate
+                                     )
+
+    for _ in tqdm(range(n_episodes)):
+        observation, info = env.reset()
+        state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+
+        for _ in count():
+            actions = {}
+            reward_tensors = {}
+
+            for agent in agents:
+                actions[agent] = trainers[agent].select_action(state)
+
+            observation, rewards, terminated, truncated, _ = env.step(actions)
+
+            for agent in agents:
+                reward = rewards[agent] if agent in rewards else 0
+                reward_tensors[agent] = torch.tensor([reward], device=device)
+
+            done = terminated or truncated
+
+            if terminated:
+                next_state = None
+            else:
+                next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+
+            for agent in agents:
+                trainers[agent].memory.push(state, actions[agent], next_state, reward_tensors[agent])
+
+            # Move to the next state
+            state = next_state
+
+            # Perform one step of the optimization (on the policy network)
+            for agent in agents:
+                trainers[agent].optimize_model()
+
+                # Soft update of the target network's weights
+                # θ′ ← τ θ + (1 −τ )θ′
+                trainers[agent].target_net_state_dict = trainers[agent].target_net.state_dict()
+                policy_net_state_dict = trainers[agent].policy_net.state_dict()
+                for key in policy_net_state_dict:
+                    trainers[agent].target_net_state_dict[key] = policy_net_state_dict[key] * update_rate + \
+                                                       trainers[agent].target_net_state_dict[key] * (1 - update_rate)
+                trainers[agent].target_net.load_state_dict(trainers[agent].target_net_state_dict)
+
+            if done:
+                break
+
+    # save models
+
+    for agent in agents:
+        trainer = trainers[agent]
+        filename = f"models/{type_agent[agent]}_{agent}_{experiment_name}.pt"
+        torch.save(trainer.policy_net.state_dict(), filename)
+        print(f"trained model saved in {filename}")
+
+    return experiment_name, trainers
+
+
 ######################################
 # q-learning
 ######################################
 
 def q_learning():
-    from mesa_gym.trainees.qlearning import QLearningTrainee
+    from mesa_gym.trainers.qlearning import QLearningTrainer
 
     learning_rate = 0.05
     start_epsilon = 1.0
-    epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
+    epsilon_decay = start_epsilon / (n_episodes / 2)
     final_epsilon = 0.1
     discount_factor = 0.95
 
     experiment_name = f"goal_world-qlearning_{n_episodes}_{learning_rate}_{discount_factor}_{start_epsilon}_{epsilon_decay}_{final_epsilon}"
 
-    trainees = {}
+    trainers = {}
     for agent in agents:
-        trainees[agent] = QLearningTrainee(agent=agent, action_space=env.action_space[agent], learning_rate=learning_rate, initial_epsilon=start_epsilon, discount_factor=discount_factor, epsilon_decay=epsilon_decay, final_epsilon=final_epsilon)
+        trainers[agent] = QLearningTrainer(agent=agent, action_space=env.action_space[agent],
+                                           learning_rate=learning_rate, initial_epsilon=start_epsilon,
+                                           discount_factor=discount_factor, epsilon_decay=epsilon_decay,
+                                           final_epsilon=final_epsilon)
 
     for episode in tqdm(range(n_episodes)):
         obs, info = env.reset()
@@ -56,7 +149,7 @@ def q_learning():
         while not done:
             actions = {}
             for agent in agents:
-                actions[agent] = trainees[agent].get_action(obs)
+                actions[agent] = trainers[agent].select_action(obs)
             next_obs, rewards, terminated, truncated, info = env.step(actions)
 
             # collect data
@@ -73,7 +166,7 @@ def q_learning():
             # update the agent
             for agent in agents:
                 reward = rewards[agent] if agent in rewards else 0
-                trainees[agent].update(obs, actions[agent], reward, terminated, next_obs)
+                trainers[agent].update(obs, actions[agent], reward, terminated, next_obs)
             obs = next_obs
 
             # update if the environment is done and the current obs
@@ -81,21 +174,27 @@ def q_learning():
             step += 1
 
         for agent in agents:
-            trainees[agent].decay_epsilon()
+            trainers[agent].decay_epsilon()
 
-    return experiment_name, trainees
+    # save the Q-table
+    import pickle
+
+    for trainer in trainers:
+        filename = f"models/{type_agent[trainer]}_{trainer}_{experiment_name}.pickle"
+        with open(f"{path}/{filename}", "wb") as f:
+            pickle.dump(trainers[trainer].q_table(), f)
+            print(f"trained model saved in {filename}")
+
+    return experiment_name, trainers
+
+experiment_name, trainers = dqn_learning()
 
 
-experiment_name, trainees = q_learning()
+
+# save data
 
 import pickle
-for trainee in trainees:
-    filename = f"models/{type_agent[trainee]}_{trainee}_{experiment_name}.pickle"
-    with open(f"{path}/{filename}", "wb") as f:
-        pickle.dump(trainees[trainee].q_table(), f)
-        print(f"trained model saved in {filename}")
 
-import pickle
 filename = f"data/{experiment_name}.pickle"
 with open(f"{path}/{filename}", "wb") as f:
     pickle.dump(data, f)
