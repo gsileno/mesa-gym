@@ -17,7 +17,7 @@ Structure of `mesa-gym` project:
   - `/market` contains communication-centered (eg. markets) worlds
   - `...`
   - `/test` clones a simple environment (no MESA) from gym to test the integration with gymnasium
-- `/trainees` contains reusable agent learning modules
+- `/trainers` contains reusable agent learning modules
 - `/common` contains helpers, eg. for data visualization
 
 Conventionally, each `mesa-gym` world contains:
