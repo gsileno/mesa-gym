@@ -29,20 +29,13 @@ def dqn_learning():
     import torch
     from itertools import count
 
-    # BATCH_SIZE is the number of transitions sampled from the replay buffer
-    # GAMMA is the discount factor as mentioned in the previous section
-    # EPS_START is the starting value of epsilon
-    # EPS_END is the final value of epsilon
-    # EPS_DECAY controls the rate of exponential decay of epsilon, higher means a slower decay
-    # TAU is the update rate of the target network
-    # LR is the learning rate of the AdamW optimizer
-    replay_batch_size = 128
-    discount_factor = 0.99
-    start_epsilon = 0.9
-    final_epsilon = 0.05
+    replay_batch_size = 32 # 128
+    learning_rate = 0.001  # 1e-4
+    discount_factor = 0.95 # 0.99
+    start_epsilon = 1.0    # 0.9
     epsilon_decay = start_epsilon / (n_episodes / 2)
+    final_epsilon = 0.1    # 0.05
     update_rate = 0.005
-    learning_rate = 1e-4
 
     experiment_name = f"goal_world-DQNlearning_{n_episodes}_{replay_batch_size}_{update_rate}_{learning_rate}_{discount_factor}_{start_epsilon}_{epsilon_decay}_{final_epsilon}"
 
@@ -125,10 +118,10 @@ def q_learning():
     from mesa_gym.trainers.qlearning import QLearningTrainer
 
     learning_rate = 0.05
+    discount_factor = 0.95
     start_epsilon = 1.0
     epsilon_decay = start_epsilon / (n_episodes / 2)
     final_epsilon = 0.1
-    discount_factor = 0.95
 
     experiment_name = f"goal_world-qlearning_{n_episodes}_{learning_rate}_{discount_factor}_{start_epsilon}_{epsilon_decay}_{final_epsilon}"
 
@@ -188,8 +181,6 @@ def q_learning():
     return experiment_name, trainers
 
 experiment_name, trainers = dqn_learning()
-
-
 
 # save data
 

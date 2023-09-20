@@ -15,8 +15,6 @@ Structure of `mesa-gym` project:
 - `/gyms` contains various gyms built on top of MESA
   - `/grid` contains grid-based symbolic worlds
   - `/market` contains communication-centered (eg. markets) worlds
-  - `...`
-  - `/test` clones a simple environment (no MESA) from gym to test the integration with gymnasium
 - `/trainers` contains reusable agent learning modules
 - `/common` contains helpers, eg. for data visualization
 
@@ -65,7 +63,7 @@ while True:
 
 #### separation of 'body' and 'mental' elements
 
-To facilitate problem decomposition, agents may be defined as body (dealing with mechanicistic interventions on and by the environment) and mind (dealing with sensory/motor decision mechanisms). As a good practice, given a certain domain, intervention of modelers should be only at mental level, that is, there is a body eg. `AgentBody(mesa.Agent)` class that comes with the environment, which is then extended by a mental element.
+To facilitate problem decomposition, agents may be defined as body (dealing with mechanicistic interventions on and by the environment) and mind (dealing with interpretation/decision mechanisms). As a good practice, given a certain domain, intervention of modelers should be only at mental level, that is, there is a body eg. `AgentBody(mesa.Agent)` class that comes with the environment, which is then extended by a mental element.
 
 For instance, the agent may take the perceptions (only a limited portion of the environment), identify the positions by the relative coordinates coming from the perception, and move randomly in any of those:
 
