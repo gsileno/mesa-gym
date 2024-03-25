@@ -75,8 +75,14 @@ class Fruit(mesa.Agent):
                         elif type(item) == Water:
                             water +=  1
                             poison += item.poison
-        poison = round(poison/10)
-        # prob_new_fruit = (water - poison) * (fruits ** 2)
+
+        poison = round(poison/5)
+        prob_new_fruit = (water - poison) * (fruits ** 2) / (500 * (4 ** 2))
+
+        # print(f"Probability of growth: {prob_new_fruit}")
+        for cell in empty_cells:
+            if random.random() <= prob_new_fruit:
+                self.model.add_entity(Fruit, cell[0], cell[1])
 
     def show(self):
         return str(Symbol.FRUIT)
@@ -128,6 +134,8 @@ class Gatherer(AgentBody):
         self.model.remove_entity(self)
 
     def react(self):
+        self.water -= 0.1
+        self.food -= 0.1
         elems = self.model.grid.get_cell_list_contents([self.pos])
         for elem in elems:
             if elem != self:
@@ -142,6 +150,16 @@ class Gatherer(AgentBody):
                     self.model.events.append((self, elem))
                     self.trace("I've found water!")
 
+        if self.water <= 0:
+            self.trace("I'm thirsty")
+            if self.water <= -5:
+                self.model.end = True
+                self.trace("I am too thirsty (end session.")
+        if self.food <= 0:
+            self.trace("I'm hungry")
+            if self.food <= -5:
+                self.model.end = True
+                self.trace("I am too hungry (end session).")
 
 #######################
 # main

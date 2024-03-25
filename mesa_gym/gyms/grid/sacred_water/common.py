@@ -68,10 +68,7 @@ class AgentBody(mesa.Agent):
         return percepts
 
     def react(self):
-        elems = self.model.grid.get_cell_list_contents([self.pos])
-        for elem in elems:
-            if elem != self:
-                pass
+        pass
 
     def move(self, direction):
         dx, dy = direction
