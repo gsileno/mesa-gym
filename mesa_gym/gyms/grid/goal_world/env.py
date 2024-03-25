@@ -139,8 +139,10 @@ class MesaGoalEnv(gym.Env):
             # else:
             if type(agent) is w.Mouse: # mouse finds cheese
                 if type(reached_entity) is w.Cheese:
-                    rewards[agent.unique_id] = 1
-                    self.events[agent]["success"] = 1
+                    rewards[agent.unique_id] = -10
+                    self.events[agent]["success"] = 0
+                # else:
+                #     rewards[agent.unique_id] = 1
 
         return rewards
 
