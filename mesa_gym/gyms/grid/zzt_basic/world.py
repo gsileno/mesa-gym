@@ -366,7 +366,7 @@ class WorldView:
         # for how mesa furnish the coordinate
         # we have to print the transpose of the world
         for cell in self.world.grid.coord_iter():
-            cell_content, x, y = cell
+            cell_content, (x, y) = cell
             if y == 0:
                 string += "|"
             if len(cell_content) > 0:
