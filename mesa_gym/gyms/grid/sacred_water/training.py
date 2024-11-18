@@ -3,9 +3,9 @@ import os
 path = os.path.dirname(os.path.abspath(__file__))
 
 # load the target environment
-import mesa_gym.gyms.grid.goal_world.env as w
+import mesa_gym.gyms.grid.sacred_water.env as e
 
-env = w.MesaSacredWaterEnv(render_mode=None)
+env = e.MesaSacredWaterEnv(render_mode=None)
 
 agents = []
 type_agent = {}
@@ -14,7 +14,7 @@ for mesa_agent in env._get_agents():
     type_agent[mesa_agent.unique_id] = type(mesa_agent).__name__
 
 # target of training
-n_episodes = 1000 # 10_000  # 100_000
+n_episodes = 10000 # 10_000  # 100_000
 
 # create the trainer instances
 
@@ -180,8 +180,8 @@ def q_learning():
 
     return experiment_name, trainers
 
-# experiment_name, trainers = dqn_learning()
 experiment_name, trainers = q_learning()
+# experiment_name, trainers = dqn_learning()
 
 # save data
 

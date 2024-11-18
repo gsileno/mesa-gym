@@ -1,12 +1,11 @@
-import mesa_gym.gyms.grid.goal_world.env as w
-
-env = w.MesaSacredWaterEnv()
-
 import numpy as np
 import pickle
 
 import os
 path = os.path.dirname(os.path.abspath(__file__))
+
+import mesa_gym.gyms.grid.sacred_water.env as w
+env = w.MesaSacredWaterEnv()
 
 empty_symbol = "█"
 
@@ -24,13 +23,9 @@ action2symbol = {
 
 # add files here if you want to use a trained model
 q_trained_models = {}
-# q_trained_models[0] = "models/Mouse_0_goal_world-qlearning_10000_0.05_0.95_1.0_0.0002_0.1.pickle"
-# q_trained_models[0] = "models/Mouse_0_goal_world-qlearning_100_0.05_0.95_1.0_0.02_0.1.pickle"
-q_trained_models[0] = "models/Mouse_0_goal_world-qlearning_1000_0.05_0.95_1.0_0.002_0.1.pickle"
+q_trained_models[2] = "models/Gatherer_2_goal_world-qlearning_1000_0.05_0.95_1.0_0.002_0.1.pickle"
 
 dqn_trained_models = {}
-# dqn_trained_models[0] = "models/Mouse_0_goal_world-DQNlearning_10000_128_0.005_0.0001_0.99_0.9_0.00018_0.05.pt"
-# dqn_trained_models[0] = "models/Mouse_0_goal_world-DQNlearning_100_32_0.005_0.001_0.95_1.0_0.02_0.1.pt"
 
 ########################################
 ## Load models                         #

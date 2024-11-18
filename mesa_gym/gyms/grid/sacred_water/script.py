@@ -1,7 +1,4 @@
-# simple script to run the zzt-like 2d grid world from gymnasium
-
-import mesa_gym.gyms.grid.goal_world.env as w
-env = w.MesaSacredWaterEnv(render_mode="human")
+# script to run models runned by gymnasium
 
 import numpy as np
 import pickle
@@ -9,11 +6,14 @@ import pickle
 import os
 path = os.path.dirname(os.path.abspath(__file__))
 
+import mesa_gym.gyms.grid.sacred_water.env as e
+env = e.MesaSacredWaterEnv(render_mode="human")
+
 q_trained_models = {}
 dqn_trained_models = {}
 
 # add files here if you want to use a trained model
-# q_trained_models[0] = "models/..."
+q_trained_models[2] = "models/Gatherer_2_goal_world-qlearning_1000_0.05_0.95_1.0_0.002_0.1.pickle"
 # dqn_trained_models[0] = "models/..."
 
 # load q_tables
@@ -44,13 +44,14 @@ for id in dqn_trained_models.keys():
 obs, info = env.reset()
 n_games = 0
 
-for _ in range(100):
+for _ in range(1000):
 
     actions = {}
     for agent in env._get_agents():
         id = agent.unique_id
         if id in q_trained_models:
             if tuple(obs) not in q_tables[id]:
+                print(obs)
                 raise RuntimeError("Warning: state not present in the Q-table, have you loaded the correct one?")
             action = int(np.argmax(q_tables[id][tuple(obs)]))
         elif id in dqn_trained_models:

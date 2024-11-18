@@ -1,27 +1,12 @@
-# basic gridworld as environment for gymnasium
+# environment for gymnasium
 
-import mesa_gym.gyms.grid.goal_world.world as w
 import numpy as np
-
 import gymnasium as gym
 from gymnasium import spaces
 
-class MesaSacredWaterlEnv(gym.Env):
-    """
-        MesaGoalEnv involves a minimal grid world.
+import mesa_gym.gyms.grid.sacred_water.world as w
 
-        ### Action Space
-        The agent takes a 1-element vector for actions.
-        All actions are just about moving; directions are provided by the MESA grid world
-
-        ### Observation Space
-        The observation space consists of a matrix with all positions of entities
-
-        ### Arguments
-        ```
-        gym.make('MesaGoalEnv-v0', map: string = None)
-        ```
-    """
+class MesaSacredWaterEnv(gym.Env):
 
     metadata = {"render_modes": ["human"], "render_fps": 25}
 
@@ -34,32 +19,13 @@ class MesaSacredWaterlEnv(gym.Env):
             self.fps = self.metadata["render_fps"]
 
         if map is None:
-#             map = """
-# |---|
-# |  ☺|
-# |   |
-# | ♠ |
-# |   |
-# |---|
-# """
-            map = """
-|--------------------|
-|                    |
-|                    |
-|                ☺   |
-|                    |
-|                    |
-|                    |
-|                    |
-|                    |
-|              ♠     |
-|                    |
-|--------------------|
-"""
+            map = w.default_map 
+
         self.map = map
         self.model = self._get_world()
         self.booting = True
 
+        # the potential actions are just movements in this environment
         self.potential_actions = w.AgentBody.get_directions()
         n_actions = len(self.potential_actions)
 
@@ -68,13 +34,16 @@ class MesaSacredWaterlEnv(gym.Env):
 
         self.entities = self._get_entities()
         self.agents = self._get_agents()
-        self.events = {}
+        self.events = {} # necessary for the first call to info
 
         size = self.model.width * self.model.height
 
         for agent in self.agents:
             self.action_space[agent.unique_id] = spaces.Discrete(n_actions)
 
+        # the observation space is made by the cartesian product
+        # of all grid with the position of each entity
+        # there is only one state for each coordinate, standing for presence
         MIN = 0; MAX = 1
         n_features = size * (MAX - MIN) * len(self.entities)
         features_high = np.array([MAX] * n_features, dtype=np.float32)
@@ -82,7 +51,7 @@ class MesaSacredWaterlEnv(gym.Env):
         self.observation_space = spaces.Box(features_low, features_high)
 
     def _get_world(self):
-        return w.create_world(self.map)
+        return w.create_world(self.map, w.Symbol)
 
     def _get_entities(self):
         return self.model.entities
@@ -90,7 +59,7 @@ class MesaSacredWaterlEnv(gym.Env):
     def _get_agents(self):
         agents = []
         for entity in self.model.entities:
-            if type(entity) is w.Mouse:
+            if type(entity) is w.Gatherer:
                 agents.append(entity)
         return agents
 
@@ -116,7 +85,7 @@ class MesaSacredWaterlEnv(gym.Env):
             self.model = self._get_world()
 
         if self.render_mode == "human":
-            self.view = w.WorldView(self.model, self.fps)
+            self.view = w.WorldView(self.model, name="sacred water", fps=self.fps)
             self.view.init()
             self.view.show()
 
@@ -128,31 +97,44 @@ class MesaSacredWaterlEnv(gym.Env):
     def _get_rewards(self, events):
         rewards = {}
 
-        # for agent in self._get_agents():
-        #     rewards[agent.unique_id] = -1               # losing energy for each time step
-
-        for agent, reached_entity in events:
+        for agent, event_type in events:
             self.events[agent] = {}
-            # if reached_entity is False:                 # collision with wall
-            #     rewards[agent.unique_id] = -5
-            #     self.events[agent]["collided"] = 1
-            # else:
-            if type(agent) is w.Mouse: # mouse finds cheese
-                if type(reached_entity) is w.Cheese:
-                    rewards[agent.unique_id] = -10
-                    self.events[agent]["success"] = 0
-                # else:
-                #     rewards[agent.unique_id] = 1
+            if type(agent) is w.Gatherer: # mouse finds cheese
+                rewards[agent.unique_id] = 0
+                if type(event_type) is tuple:
+                    if event_type[1] is not None:
+                        rewards[agent.unique_id] -= 1
+                        self.events[agent]["moving"] = 1
+                    else: 
+                        rewards[agent.unique_id] -= 0
+                        if type(event_type[0]) is w.Fruit:
+                            self.events[agent]["starved"] = 1
+                        else:
+                            self.events[agent]["shrivelled"] = 1
+
+                if type(event_type) is w.Fruit:
+                    rewards[agent.unique_id] += 100
+                    self.events[agent]["eating"] = 1
+                elif type(event_type) is w.Water:
+                    rewards[agent.unique_id] += 0
+                    self.events[agent]["drinking"] = 1
+                # elif event_type is False:  # movement has failed
+                #     rewards[agent.unique_id] = -5
+                #     self.events[agent]["collided"] = 1
 
         return rewards
 
 
     def step(self, actions):
 
+        self.events = {}
+
         for agent in self._get_agents():
             agent.next_action = self.potential_actions[actions[agent.unique_id]]
 
-        self.events = {}
+        # there are two components of event in one step:
+        # 1. the action performed by the agents
+        # 2. the outcomes consequent to the actions
         terminated, events = self.model.step()
 
         if self.render_mode == "human":

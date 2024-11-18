@@ -62,22 +62,27 @@ class Fruit(mesa.Agent):
         for dx in range(-1, 2):
             for dy in range(-1, 2):
                 if dx != 0 or dy != 0:
-                    absx, absy = self.pos
-                    x = (absx + dx) % self.model.width
-                    y = (absy + dy) % self.model.height
+                    if self.pos is not None:
+                        absx, absy = self.pos
+                        x = (absx + dx) % self.model.width
+                        y = (absy + dy) % self.model.height
 
-                    items = self.model.grid.get_cell_list_contents((x, y))
-                    if len(items) == 0:
-                        empty_cells.append((x, y))
-                    for item in items:
-                        if type(item) == Fruit:
-                            fruits += 1
-                        elif type(item) == Water:
-                            water +=  1
-                            poison += item.poison
+                        items = self.model.grid.get_cell_list_contents((x, y))
+                        if len(items) == 0:
+                            empty_cells.append((x, y))
+                        for item in items:
+                            if type(item) == Fruit:
+                                fruits += 1
+                            elif type(item) == Water:
+                                water +=  1
+                                poison += item.poison
+                    # else:
+                    # TOCHECK: THIS IS A BUG OCCURRING NOW
 
+
+        # almost arbitrary formula to govern the probability of new fruits to be generated
         poison = round(poison/5)
-        prob_new_fruit = (water - poison) * (fruits ** 2) / (500 * (4 ** 2))
+        prob_new_fruit = (max(water - poison, 0)) * (fruits ** 2) / (250 * (4 ** 2))
 
         # print(f"Probability of growth: {prob_new_fruit}")
         for cell in empty_cells:
@@ -152,12 +157,14 @@ class Gatherer(AgentBody):
 
         if self.water <= 0:
             self.trace("I'm thirsty")
-            if self.water <= -5:
+            if self.water < -5:
+                self.model.events.append((self, (Water, None)))
                 self.model.end = True
-                self.trace("I am too thirsty (end session.")
+                self.trace("I am too thirsty (end session).")
         if self.food <= 0:
             self.trace("I'm hungry")
-            if self.food <= -5:
+            if self.food < -5:
+                self.model.events.append((self, (Fruit, None)))
                 self.model.end = True
                 self.trace("I am too hungry (end session).")
 
@@ -165,25 +172,41 @@ class Gatherer(AgentBody):
 # main
 #######################
 
-if __name__ == "__main__":
+# default_map = """
+# |--------------------|
+# |        σ           |
+# |                    |
+# | ░░░             ☺  |
+# |  ░░░               |
+# |          σ     σ   |
+# | σ                  |
+# |                 σ  |
+# |                    |
+# |     σσ░░░░         |
+# |    σ░░░░░░░░       |
+# |--------------------|
+# """
 
-    map = """
+default_map = """
 |--------------------|
 |        σ           |
 |                    |
-| ░░░             ☺  |
-|  ░░░               |
-|          σ     σ   |
-| σ                  |
-|                 σ  |
+| ░               ☺  |
 |                    |
-|     σσ░░░░         |
-|    σ░░░░░░░░       |
+|                    |
+|                    |
+|                    |
+|                    |
+|                    |
+|    σ░              |
 |--------------------|
 """
 
-    model = create_world(map, symbol_type=Symbol)
-    view = WorldView(model)
+if __name__ == "__main__":
+
+
+    model = create_world(default_map, symbol_type=Symbol)
+    view = WorldView(model, name="sacred water")
     view.init()
     view.show()
 

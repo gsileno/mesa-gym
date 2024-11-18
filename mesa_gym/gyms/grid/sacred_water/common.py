@@ -81,6 +81,7 @@ class AgentBody(mesa.Agent):
             disabilities = []
         if (x, y) not in [disabled() for disabled in disabilities]:
             self.model.grid.move_agent(self, (x, y))
+            self.model.events.append((self, (dx, dy)))
         else:
             self.model.events.append((self, False))
             self.trace("action 'move' failed")
@@ -106,6 +107,7 @@ class AgentBody(mesa.Agent):
             self.next_action = self.random.choice(self.get_directions())
         # self.trace(f"next action: {self.next_action}")
         self.move(self.next_action)
+
         self.next_action = None
 
     def show(self):
@@ -119,6 +121,7 @@ class AgentBody(mesa.Agent):
 class WorldModel(mesa.Model):
 
     def __init__(self, width, height):
+        super().__init__()
         self.entities = []
         self.disabilities = {}
         self.width = width
@@ -139,9 +142,10 @@ class WorldModel(mesa.Model):
         for entity in self.entities:
             entity_type = str(type(entity))
             if entity_type not in positions:
-                positions[entity_type] = []
-                for _ in range(size):
-                    positions[entity_type].append(0)
+                # positions[entity_type] = []
+                # for _ in range(size):
+                #     positions[entity_type].append(0)
+                positions[entity_type] = [0] * size
 
             if entity.pos is not None:
                 x, y = entity.pos
@@ -187,8 +191,12 @@ def move(x, y):
 
 
 class WorldView:
-    def __init__(self, world_model, fps=25):
+    def __init__(self, world_model, name=None, fps=25):
         self.world = world_model
+        if name is None:
+            self.name = "unknown world"
+        else:
+            self.name = name
 
         # from frame per second (fps) toseconds per frame (ms)
         # eg. 25 f/s = 1/25 s/f = 1000/25 ms/f = 40 ms/f
@@ -199,7 +207,7 @@ class WorldView:
 
     def header(self):
         move(0, 0)
-        print("mesagym -- minimal gym built on top on mesa\n")
+        print(f"mesagym -- {self.name}\n")
 
     def show(self, reverse_order=False):
         self.header()
